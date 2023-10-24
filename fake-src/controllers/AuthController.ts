@@ -7,13 +7,11 @@ const TokenGenerator = new TokenService();
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const userData = req.body;
+    const { first_name, last_name, email, password, phone_number } = req.body;
     // Hash the user's password before saving it to the database
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-    userData.password = hashedPassword;
+    const hashedPassword = await bcrypt.hash( password, 10);
 
-    const user = new User(userData);
-    const createdUser = await user.createNewUser(userData);
+    const createdUser = await User.createNewUser(first_name, last_name, email, hashedPassword, phone_number);
 
     if (createdUser) {
       // User registration successful

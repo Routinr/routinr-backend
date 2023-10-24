@@ -9,8 +9,8 @@
       "skipLibCheck": true                                // Skip type checking of .d.ts files
     },
     "include": [
-      "./src/**/*.ts"                                     // Specify TypeScript files to include
-    ],
+      "./fake-src/**/*.ts"                                     // Specify TypeScript files to include
+, "fake-src/app.ts"    ],
     "exclude": [
       "./dist"                                            // Specify directories/files to exclude from compilation
     ]

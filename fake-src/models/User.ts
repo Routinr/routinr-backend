@@ -10,7 +10,7 @@ class User {
   password: string | undefined;
   is_email_verified: boolean | undefined;
   phone_number: string | undefined;
-  refresh_token: string | undefined;
+  refresh_token: string | null = null;
 
   constructor(data: any) {
     this.id = data.id;
@@ -28,11 +28,18 @@ class User {
    * @param userData Object containing user data
    * @returns Promise<User | null> A promise that resolves to the created user or null if an error occurs
    */
-public async createNewUser(userData: any): Promise<User | null> {
+public static async createNewUser(first_name: string, last_name: string, email: string, password: string, phone_number: string): Promise<User | null> {
     try {
-      
       const createdUser = await prisma.user.create({
-        data: userData,
+        data: {
+          first_name: first_name,
+          last_name: last_name,
+          email: email,
+          password: password,
+          is_email_verified: false,
+          phone_number: phone_number,
+          refresh_token: null
+        },
       });
       return new User(createdUser);
     } catch (error) {

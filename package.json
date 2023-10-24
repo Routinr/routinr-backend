@@ -1,8 +1,8 @@
 {
-  "name": "routinr_user-auth",
+  "name": "routinr_backend",
   "version": "1.0.0",
-  "description": "This is the User Authentication and Profile Management Service for Routinr.",
-  "main": "app.js",
+  "description": "Routinr Backend - The backend infrastructure for routinr, a Productivity app.",
+  "main": "dist/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
@@ -11,7 +11,7 @@
   "author": "Alexin",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "^5.5.0",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^5.0.1",
     "@types/cors": "^2.8.15",
@@ -26,6 +26,6 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "prisma": "^5.4.2"
+    "prisma": "^5.5.0"
   }
 }
