@@ -4,8 +4,8 @@ import { registerUser, loginUser, fetchUserById, startVerifyUserEmail, endVerify
 
 export const authRouter = Router()
 
-authRouter.post("/register", registerUser)
-authRouter.post("/login", loginUser)
+authRouter.post("/register", registerUser);
+authRouter.post("/login", loginUser);';'
 authRouter.post('/verify-user-email/start', startVerifyUserEmail);
 authRouter.post('/verify-user-email/end', endVerifyUserEmail);
 authRouter.post('/forgot-password', forgotPassword);
