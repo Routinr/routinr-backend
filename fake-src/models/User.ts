@@ -12,7 +12,6 @@ class User extends Model {
   password: string | undefined;
   is_email_verified: boolean | undefined;
   phone_number: string | undefined;
-  refresh_token: string | null = null;
 
 
   getId(): number | null {
@@ -23,7 +22,7 @@ class User extends Model {
     return this.first_name? this.first_name : '';
   }
 
-  static async createAccount(first_name: string, last_name: string, username: string, email: string, password: string, phone_number: number, is_email_verified: boolean, refresh_token: string | null): Promise<User | null> {
+  static async createAccount(first_name: string, last_name: string, username: string, email: string, password: string, phone_number: number, is_email_verified: boolean): Promise<User | null> {
     try {
       const newUser = await User.create({
         first_name,
@@ -32,8 +31,7 @@ class User extends Model {
         email,
         password,
         is_email_verified,
-        phone_number,
-        refresh_token
+        phone_number
       });
 
       return newUser;
@@ -43,25 +41,8 @@ class User extends Model {
     }
   }
 
-static async getRefreshToken(userId: number): Promise<string | null> {
-  try {
-    const user = await User.findOne({ where: { id: userId } });
-    return user ? user.refresh_token : null;
-  } catch (error) {
-    console.error('Error fetching token:', error);
-    return null;
-  }
-}
   getEmail(): string {
     return this.email? this.email : '';
-  }
-
-  static async updateRefreshToken(userId: number, token: string): Promise<void> {
-    try {
-      await User.update({ refresh_token: token }, { where: { id: userId } });
-    } catch (error) {
-      console.error('Error updating refresh token:', error);
-    }
   }
 
     static async getUserById(id: number): Promise<User | null> {

@@ -1,9 +1,14 @@
 import User from "../models/User";
 import { Request, Response } from "express";
-import TokenService from "../models/RefreshToken";
+import RefreshToken from "../models/RefreshToken";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
+import { sendEmail } from "../utils/email";
+import AccessTokenGenerator from "../models/AccessToken";
 
-const TokenGenerator = new TokenService();
+const jwtSecret = process.env.JWT_SECRET || 'hack_winner';
+
+const AGT = new AccessTokenGenerator();
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -16,15 +21,17 @@ export const registerUser = async (req: Request, res: Response) => {
     let oldUser = await User.getUserByIdentifier(email);
 
     if (oldUser) {
-      return res.status(402).json({error: "DUPLICATE_USER_ENTRY"})
+      return res.status(409).json({error: "DUPLICATE_USER_ENTRY"})
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const createdUser = await User.createAccount(first_name, last_name, username, email, hashedPassword, phone_number, false, null);
+    const createdUser = await User.createAccount(first_name, last_name, username, email, hashedPassword, phone_number, false);
 
-    if (createdUser) {
-      res.status(201).json(createdUser);
+    if (createdUser && createdUser.id !== undefined) {
+      const token = RefreshToken.createToken(createdUser.id);
+        const accessToken = await AGT.generate(createdUser.id);
+        res.status(201).json({ message: "Account created successfully! Please verify your email then go through the onboarding stages.", token: accessToken, isEmailVerified: false });
     } else {
       res.status(500).json({ error: 'INTERNAL_FUNCTION_ERROR' });
     }
@@ -34,24 +41,108 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export async function loginUser(req: Request, res: Response): Promise<void> {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
     let user = await User.getUserByIdentifier(email);
-    if (!user) {
-      return res.status(401).json({ error: 'USER_NOT_FOUND' });
-    } else if (!(await bcrypt.compare(password, user.password!))) {
-      return res.status(401).json({ error: 'INVALID_PASSWORD' });
-    }
+    if (user) {
+      if (await user.checkPassword(password)) {
 
-    await TokenService.replaceRefreshToken(user.id!);
-    user = await User.getUserById(user.id!);
-    res.status(200).json(user);
+        // Retrieve the user's ID
+        const userId = user.id;
+
+
+        const existingRefreshToken = await RefreshToken.findOne({
+          where: {
+            userId,
+          },
+        });
+
+        // If there's an existing refresh token, delete it
+        if (existingRefreshToken) {
+          await existingRefreshToken.destroyToken();
+        }
+        if (userId) {
+          const accessToken = await AGT.generate(userId);
+          const refreshToken = RefreshToken.createToken(userId);
+          res.status(200).json({ message: 'Login successful', accessToken });
+        }
+      } else {
+        res.status(401).json({ error: 'Invalid password' });
+      }
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
   } catch (error) {
-    console.error('Error logging in user:', error);
-    res.status(500).json({ error: 'INTERNAL_SERVER_ERROR' });
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'An error occurred' });
   }
-};
+}
+export async function startVerifyUserEmail(req: Request, res: Response): Promise<void> {
+  const { userId, email } = req.body;
+  const verifyToken = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+  const verifyLink = jwt.sign({ userId, verifyToken }, jwtSecret, { expiresIn: '12m' });
+  const emailText = `<h1>Welcome to Routinr!</h1><p>To verify your email, click on the link below:</p><p><a href="http://relisted-labels-frontend.vercel.app/verifyEmail/?token=${verifyLink}">Verify Email</a></p>. This token expires in 10 minutes, btw. Goodluck!`;
+  try {
+    await sendEmail(email, 'Verify your email', emailText);
+    res.status(200).json({ message: 'EMAIL_SENT' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'INTERNAL_SERVER_ERROR' });
+  }
+}
+
+export async function endVerifyUserEmail(req: Request, res: Response): Promise<void> {
+  const { verifyToken, userId } = req.body;
+
+  try {
+    const decodedToken = jwt.verify(verifyToken, jwtSecret) as { userId: number; verifyToken: string, exp: number };
+    const now = Math.floor(Date.now() / 1000);
+
+    if (decodedToken.userId === userId && decodedToken.verifyToken && decodedToken.exp > now) {
+      const user = await User.getUserById(userId);
+      if (user) {
+        user.verifyUserEmail();
+        res.status(200).json({ message: 'EMAIL_VERIFIED' });
+      }
+    } else {
+      res.status(400).json({ message: 'INVALID_EXPIRED_TOKEN' });
+    }
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    res.status(500).json({ error: 'INVALID_EXPIRED_TOKEN' });
+  }
+}
+
+export async function forgotPassword(req: Request, res: Response) {
+  const { email } = req.body;
+  const user = await User.findOne({ where: { email } });
+  if (user) {
+    const userId = user.getId()
+    const resetToken = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+    const resetLink = jwt.sign({ userId, resetToken }, jwtSecret, { expiresIn: '12m' });
+    const emailText = `Hi there! A little birdie from Routinr told me you forgot your password. No worries, we're here to help!
+
+    To reset your password, click on the link below:<br><br>
+    <a href="https://relisted-labels-frontend.vercel.app/resetPassword?token=${resetLink}">Reset Password</a><br><br>
+    
+    This link will expire in 10 minutes, so don't wait too long! If you didn't request this password reset, please ignore this email.
+    
+    Thanks,
+    Alex from Routinr
+    `;
+
+    try {
+      await sendEmail(email, 'Reset Password - Routinr', emailText);
+      return res.status(200).json({ message: 'EMAIL_SENT' });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'ERROR_SENDING_EMAIL' });
+    }
+  } else{
+  return res.status(404).json({ message: 'USER_NOT_FOUND' });
+  }
+}
 
 
 export const fetchUserById = async (req: Request, res: Response) => {
