@@ -144,6 +144,29 @@ export async function forgotPassword(req: Request, res: Response) {
   }
 }
 
+export async function resetPassword(req: Request, res: Response) {
+  let { token, password } = req.body;
+  try {
+    const decodedToken = jwt.verify(token, jwtSecret) as { userId: number; resetToken: string, exp: number };
+    const now = Math.floor(Date.now() / 1000);
+
+    if (decodedToken.userId && decodedToken.resetToken && decodedToken.exp > now) {
+      const user = await User.getUserById(decodedToken.userId);
+      if (user) {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        user.updatePassword(hashedPassword);
+        res.status(200).json({ message: 'Password reset successfully' });
+      }
+    } else {
+      res.status(400).json({ message: 'Invalid or expired token. Please try again.' });
+    }
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'An error occurred' });
+  };
+}
+
 
 export const fetchUserById = async (req: Request, res: Response) => {
   try {
