@@ -157,10 +157,6 @@ User.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
-  refresh_token: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
 }, {
   sequelize: sequelize,
   tableName: 'users',

@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize';
 
-const dbHost = process.env.DB_HOST ?? 'routinr-routinr-dev.a.aivencloud.com';
-const dbUser = process.env.DB_USER ?? 'avnadmin';
-const dbPassword = process.env.DB_PASSWORD ?? 'AVNS_KBjSJ4SDAEZJpx0PSrU';
-const dbName = process.env.DB_NAME ?? 'defaultdb';
+const dbHost = process.env.DB_HOST ?? '';
+const dbUser = process.env.DB_USER ?? '';
+const dbPassword = process.env.DB_PASSWORD ?? '';
+const dbName = process.env.DB_NAME ?? '';
 
 const dbConfig = {
   database: dbName,

@@ -30,8 +30,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
     if (createdUser && createdUser.id !== undefined) {
       const token = RefreshToken.createToken(createdUser.id);
-        const accessToken = await AGT.generate(createdUser.id);
-        res.status(201).json({ message: "Account created successfully! Please verify your email then go through the onboarding stages.", token: accessToken, isEmailVerified: false });
+      const accessToken = await AGT.generate(createdUser.id);
+      res.status(201).json({ message: "Account created successfully! Please verify your email then go through the onboarding stages.", token: accessToken, isEmailVerified: false });
     } else {
       res.status(500).json({ error: 'INTERNAL_FUNCTION_ERROR' });
     }
