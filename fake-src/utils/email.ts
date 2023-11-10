@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const emailPass = process.env.EMAIL_PASS || "ehlp savi gohc itcf";
+const emailPass = process.env.EMAIL_PASS || "";
 
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
     try {

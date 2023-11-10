@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { sendEmail } from "../utils/email";
 import AccessTokenGenerator from "../models/AccessToken";
 
-const jwtSecret = process.env.JWT_SECRET || 'hack_winner';
+const jwtSecret = process.env.JWT_SECRET || 'dumb';
 
 const AGT = new AccessTokenGenerator();
 
@@ -14,7 +14,7 @@ export const registerUser = async (req: Request, res: Response) => {
   try {
     const { first_name, last_name, username, email, password, phone_number } = req.body;
 
-    if (!first_name || !last_name || !email || !password || !phone_number) {
+    if (!first_name || !last_name || !username || !email || !password || !phone_number) {
       return res.status(400).json({ error: 'MISSING_USER_DATA' });
     }
 
@@ -105,7 +105,9 @@ export async function endVerifyUserEmail(req: Request, res: Response): Promise<v
         user.verifyUserEmail();
         res.status(200).json({ message: 'EMAIL_VERIFIED' });
       }
+      console.log("Token Valid!")
     } else {
+      console.log("Token Invalid.")
       res.status(400).json({ message: 'INVALID_EXPIRED_TOKEN' });
     }
   } catch (error) {
