@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import bcrypt from 'bcrypt';
 
 import sequelize from '../config/db';
@@ -13,6 +13,12 @@ class User extends Model {
   is_email_verified: boolean | undefined;
   phone_number: string | undefined;
 
+  static associate(models: any) {
+    User.hasMany(models.Routine, {
+      foreignKey: 'user_id',
+      as: 'routines'
+    })
+  }
 
   getId(): number | null {
     return this.id ? this.id : null;
