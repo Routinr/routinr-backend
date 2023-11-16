@@ -1,0 +1,639 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Routinr API",
+    "description": "API documentation for the Routinr backend",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://routinr-backend.onrender.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+      "/auth/register": {
+          "post": {
+            "summary": "Register a new user",
+            "requestBody": {
+              "description": "User details for registration",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "first_name": {
+                        "type": "string"
+                      },
+                      "last_name": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "password": {
+                        "type": "string"
+                      },
+                      "phone_number": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Account created successfully",
+                "content": {
+                  "application/json": {
+                    "example": {
+                      "message": "Account created successfully! Please verify your email then go through the onboarding stages.",
+                      "token": "yourAccessTokenHere",
+                      "isEmailVerified": false
+                    }
+                  }
+                }
+              },
+              "400": {
+                "description": "Missing user data",
+                "content": {
+                  "application/json": {
+                    "example": {
+                      "error": "MISSING_USER_DATA"
+                    }
+                  }
+                }
+              },
+              "409": {
+                "description": "Duplicate user entry",
+                "content": {
+                  "application/json": {
+                    "example": {
+                      "error": "DUPLICATE_USER_ENTRY"
+                    }
+                  }
+                }
+              },
+              "500": {
+                "description": "Internal function error",
+                "content": {
+                  "application/json": {
+                    "example": {
+                      "error": "INTERNAL_FUNCTION_ERROR"
+                    }
+                  }
+                }
+              }
+            }
+          }
+      },
+      "/auth/login": {
+        "post": {
+          "summary": "Login with user credentials",
+          "requestBody": {
+            "description": "User credentials for login",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "Login successful",
+                    "accessToken": "yourAccessTokenHere"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid password",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "Invalid password"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User not found",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "User not found"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "An error occurred"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/verify-user-email/start": {
+        "post": {
+          "summary": "Start the email verification process",
+          "requestBody": {
+            "description": "User details for email verification",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Email sent successfully",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "EMAIL_SENT"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "INTERNAL_SERVER_ERROR"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/verify-user-email/end": {
+        "post": {
+          "summary": "Complete the email verification process",
+          "requestBody": {
+            "description": "User details for completing email verification",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "verifyToken": {
+                      "type": "string"
+                    },
+                    "userId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Email verification successful",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "EMAIL_VERIFIED"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid or expired token",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "INVALID_EXPIRED_TOKEN"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "INVALID_EXPIRED_TOKEN"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/forgot-password": {
+        "post": {
+          "summary": "Initiate the password reset process",
+          "requestBody": {
+            "description": "User details for password reset initiation",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Email sent successfully",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "EMAIL_SENT"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User not found",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "USER_NOT_FOUND"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "ERROR_SENDING_EMAIL"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/reset-password": {
+        "post": {
+          "summary": "Reset the user's password",
+          "requestBody": {
+            "description": "User details for password reset",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Password reset successful",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "Password reset successfully"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid or expired token",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "Invalid or expired token. Please try again."
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "message": "An error occurred"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/routines/user/{user_id}": {
+        "get": {
+          "summary": "Retrieve routines by user ID",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "description": "ID of the user whose routines are to be retrieved",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Routines retrieved successfully",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "routines": [
+                      {
+                        "id": 1,
+                        "user_id": 123,
+                        "name": "Morning Routine",
+                        "description": "Start your day right",
+                        "time_block": "1h"
+                      },
+                      {
+                        "id": 2,
+                        "user_id": 123,
+                        "name": "Evening Routine",
+                        "description": "Wind down gracefully",
+                        "time_block": "1.5h"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Routines not found",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "ROUTINES_NOT_FOUND"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "INTERNAL_SERVER_ERROR"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/routines/view/{routine_id}": {
+        "get": {
+          "summary": "Retrieve information about a routine by ID",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "routine_id",
+              "description": "ID of the routine to be retrieved",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Routine information retrieved successfully",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "id": 1,
+                    "user_id": 123,
+                    "name": "Morning Routine",
+                    "description": "Start your day right",
+                    "time_block": "1h",
+                    "steps": [
+                      {
+                        "id": 1,
+                        "routine_id": 1,
+                        "name": "Wake up",
+                        "description": "Gently, no alarms"
+                      },
+                      {
+                        "id": 2,
+                        "routine_id": 1,
+                        "name": "Morning stretch",
+                        "description": "Reach for the stars"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Routine not found",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "ROUTINE_NOT_FOUND"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "example": {
+                    "error": "INTERNAL_SERVER_ERROR"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+  },
+  "components": {
+    "schemas": {
+        "User": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "is_email_verified": {
+                    "type": "boolean"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            },
+            "required": ["first_name", "last_name", "username", "email", "password", "is_email_verified", "phone_number"],
+            "example": {
+                "id": 1,
+                "first_name": "John",
+                "last_name": "Doe",
+                "username": "johndoe",
+                "email": "john@example.com",
+                "password": "hashedpassword",
+                "is_email_verified": false,
+                "phone_number": "1234567890"
+            }
+        },
+        "Routine": {
+          "type": "object",
+          "properties": {
+              "id": {
+                  "type": "integer"
+              },
+              "user_id": {
+                  "type": "integer"
+              },
+              "name": {
+                  "type": "string"
+              },
+              "description": {
+                  "type": "string"
+              },
+              "time_block": {
+                  "type": "string"
+              },
+              "steps": {
+                  "type": "array",
+                  "items": {
+                      "$ref": "#/components/schemas/Step"
+                  }
+              }
+          },
+          "required": ["user_id", "name", "description", "time_block"],
+          "example": {
+              "id": 1,
+              "user_id": 2,
+              "name": "Morning Routine",
+              "description": "A refreshing start to the day",
+              "time_block": "1h",
+              "steps": [
+                  {
+                      "id": 1,
+                      "routine_id": 1,
+                      "name": "Wake Up",
+                      "icon": "☀️",
+                      "time_slot": "6:00 AM",
+                      "description": "Greet the day with a smile"
+                  },
+                  {
+                      "id": 2,
+                      "routine_id": 1,
+                      "name": "Stretch",
+                      "icon": "🤸",
+                      "time_slot": "6:15 AM",
+                      "description": "Reach for the sky"
+                  }
+              ]
+          }
+        },
+        "Step": {
+          "type": "object",
+          "properties": {
+              "id": {
+                  "type": "integer"
+              },
+              "routine_id": {
+                  "type": "integer"
+              },
+              "name": {
+                  "type": "string"
+              },
+              "icon": {
+                  "type": "string"
+              },
+              "time_slot": {
+                  "type": "string"
+              },
+              "description": {
+                  "type": "string"
+              }
+          },
+          "required": ["routine_id", "name", "icon", "time_slot", "description"],
+          "example": {
+              "id": 1,
+              "routine_id": 2,
+              "name": "Workout",
+              "icon": "🏋️‍♂️",
+              "time_slot": "7:00 AM",
+              "description": "Get those gains!"
+          }
+        }
+    }
+  }
+}
