@@ -507,7 +507,7 @@
           }
         }
       },
-      "/api/routines/create": {
+      "/routines/create": {
         "post": {
           "summary": "Create a new routine",
           "parameters": [
@@ -585,7 +585,7 @@
           }
         }
       },
-      "/api/routines/delete/{routine_id}": {
+      "/routines/delete/{routine_id}": {
         "post": {
           "summary": "Delete a routine by ID",
           "parameters": [
@@ -633,7 +633,7 @@
           }
         }
       },
-      "/api/routines/update": {
+      "/routines/update": {
         "put": {
           "summary": "Update a routine by ID",
           "parameters": [
@@ -718,7 +718,7 @@
           }
         }
       },
-      "/api/routines/step/add": {
+      "/routines/step/add": {
         "post": {
           "summary": "Create a new step",
           "parameters": [
@@ -801,7 +801,7 @@
           }
         }
       },
-      "/api/routines/step/delete/{step_id}": {
+      "/routines/step/delete/{step_id}": {
         "post": {
           "summary": "Delete a step by ID",
           "parameters": [
@@ -849,7 +849,7 @@
           }
         }
       },
-      "/api/routines/step/update": {
+      "/routines/step/update": {
         "put": {
           "summary": "Update a step by ID",
           "parameters": [
@@ -939,7 +939,7 @@
           }
         }
       },
-      "/api/routines/steps/{routine_id}": {
+      "/routines/steps/{routine_id}": {
         "get": {
           "summary": "Retrieve steps by routine ID",
           "parameters": [
@@ -1002,7 +1002,7 @@
           }
         }
       },
-      "/api/routines/step/{step_id}": {
+      "/routines/step/{step_id}": {
         "get": {
           "summary": "Retrieve details of a step by ID",
           "parameters": [
