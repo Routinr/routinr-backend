@@ -120,7 +120,7 @@ export const updateStep = async (req: Request, res: Response) => {
         const step = await Step.getStepById(parseInt(step_id, 10));
 
         if (step) {
-            await Step.updateStep(parseInt(step_id, 10), updates);
+            await step.updateStep(parseInt(step_id, 10), updates);
             res.status(200).json({ message: "Step deleted successfully" });
         } else {
             res.status(404).json({ error: "Step not found" });
@@ -138,7 +138,7 @@ export const deleteStep = async (req: Request, res: Response) => {
         const step = await Step.getStepById(parseInt(step_id, 10));
 
         if (step) {
-            await Step.deleteStep(parseInt(step_id, 10));
+            await step.deleteStep(step.id);
             res.status(200).json({ message: "Step deleted successfully" });
         } else {
             res.status(404).json({ error: "Step not found" });

@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import sequelize from '../config/db';
 
 class Step extends Model {
-    private id!: number;
+    public id!: number;
     private routine_id!: number;
     private name!: string;
     private icon!: string;
@@ -28,7 +28,7 @@ class Step extends Model {
      * @param {string} description - The description of the step.
      * @return {Promise<Step | null>} The newly created step, or null if there was an error.
      */
-    public async createStep(name: string, routine_id: number, icon: string, time_slot: string, description: string): Promise<Step | null> {
+    public static async createStep(name: string, routine_id: number, icon: string, time_slot: string, description: string): Promise<Step | null> {
         try {
             const newStep = await Step.create({
                 routine_id,
@@ -50,7 +50,7 @@ class Step extends Model {
      * @param {number} routine_id - The ID of the routine.
      * @return {Promise<Step[] | null>} - A promise that resolves to an array of steps or null if an error occurs.
      */
-    public async getStepsByRoutineId(routine_id: number): Promise<Step[] | null> {
+    public static async getStepsByRoutineId(routine_id: number): Promise<Step[] | null> {
         try {
             const steps = await Step.findAll({
                 where: {
@@ -104,7 +104,7 @@ public async deleteStep(id: number): Promise<boolean> {
  * @param {number} id - The ID of the step to retrieve.
  * @return {Promise<Step | null>} A promise that resolves to the retrieved step, or null if it does not exist.
  */
-public async getStepById(id: number): Promise<Step | null> {
+public static async getStepById(id: number): Promise<Step | null> {
     try {
         const step = await Step.findByPk(id);
         return step;
