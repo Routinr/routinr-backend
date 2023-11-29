@@ -12,37 +12,14 @@ const corsOptions = {
 import express from 'express';
 import { authRouter } from './routes/auth';
 import { routinesRouter } from './routes/routines';
+import { taskRouter } from './routes/tasks';
 
 const app = express();
 const port = process.env.PORT || 3000;
 // Enable CORS for all routes or for specific routes as needed
 
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import * as swaggerDocument from './config/swagger.json';  // Adjust the path accordingly
-
-const swaggerOptions = {
-  swaggerDefinition: {
-    info: {
-      title: 'Routinr API',
-      description: 'API documentation for the Routinr backend',
-      version: '1.0.0',
-    },
-    servers: [
-      {
-        url: 'http://localhost:3000', // Adjust the URL as needed
-        description: 'Development server',
-      },
-      {
-        url: 'https://routinr-backend.onrender.com', // Adjust the URL as needed
-        description: 'Production server',
-      },
-    ],
-  },
-  apis: [`${__dirname}/routes/*.js`], // Adjust the path pattern to match your route files
-};
-
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(cors());
@@ -52,6 +29,8 @@ app.use(express.json());
 // Use the defined router
 app.use('/auth', authRouter);
 app.use('/routines', routinesRouter);
+app.use('/tasks', taskRouter);
+
 
 app.get('/', (req, res) => {
   res.redirect('/api-docs');

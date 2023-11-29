@@ -41,6 +41,49 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
+export async function tokenVerification(req: Request, res: Response, next: Function) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'TOKEN_NOT_FOUND_IN_HEADER' });
+  }
+
+  try {
+    const decodedToken = jwt.decode(token) as { exp: number; user: { id: number } };
+    const expDate = decodedToken?.exp;
+    const userId = decodedToken?.user.id;
+
+    if (!expDate) {
+      return res.status(401).json({ error: 'INVALID_TOKEN_EXPIRATION' });
+    }
+
+      if (expDate < Math.floor(Date.now() / 1000)) {
+        const refreshToken = await RefreshToken.getTokenByUserId(userId);
+
+        if (refreshToken) {
+          const tokenIsValid = await refreshToken.checkTokenValidity();
+
+          if (tokenIsValid) {
+            const accessToken = await AGT.generate(userId);
+
+              res.setHeader('Authorization', `Bearer ${accessToken}`);
+              return next();
+            } else {
+              return res.status(404).json({ error: 'USER_NOT_FOUND' });
+            }
+        } else {
+            return res.status(401).json({ error: 'INVALID_REFRESH_TOKEN' });
+         }
+      } else {
+         return next();
+      }
+    }
+  catch (error) {
+    console.error('Error in tokenVerification:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+
+}
+
 export async function loginUser(req: Request, res: Response): Promise<void> {
   const { email, password } = req.body;
   try {
@@ -78,6 +121,7 @@ export async function loginUser(req: Request, res: Response): Promise<void> {
     res.status(500).json({ error: 'An error occurred' });
   }
 }
+
 export async function startVerifyUserEmail(req: Request, res: Response): Promise<void> {
   const { userId, email } = req.body;
   const verifyToken = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
@@ -94,7 +138,6 @@ export async function startVerifyUserEmail(req: Request, res: Response): Promise
 
 export async function endVerifyUserEmail(req: Request, res: Response): Promise<void> {
   const { verifyToken, userId } = req.body;
-
   try {
     const decodedToken = jwt.verify(verifyToken, jwtSecret) as { userId: number; verifyToken: string, exp: number };
     const now = Math.floor(Date.now() / 1000);
@@ -123,6 +166,7 @@ export async function forgotPassword(req: Request, res: Response) {
     const userId = user.getId()
     const resetToken = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
     const resetLink = jwt.sign({ userId, resetToken }, jwtSecret, { expiresIn: '12m' });
+
     const emailText = `Hi there! A little birdie from Routinr told me you forgot your password. No worries, we're here to help!
 
     To reset your password, click on the link below:<br><br>
@@ -133,7 +177,7 @@ export async function forgotPassword(req: Request, res: Response) {
     Thanks,
     Alex from Routinr
     `;
-
+    
     try {
       await sendEmail(email, 'Reset Password - Routinr', emailText);
       return res.status(200).json({ message: 'EMAIL_SENT' });
@@ -155,10 +199,19 @@ export async function resetPassword(req: Request, res: Response) {
     if (decodedToken.userId && decodedToken.resetToken && decodedToken.exp > now) {
       const user = await User.getUserById(decodedToken.userId);
       if (user) {
+        const userId = user.getId();
+        if (!userId) {
+          res.status(500).json({error: "User ID not found."})
+        } else {
+          const refreshToken = await RefreshToken.getTokenByUserId(userId);
+          if (refreshToken) {
+            await refreshToken.destroyToken();
+          }
+        }
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         user.updatePassword(hashedPassword);
-        res.status(200).json({ message: 'Password reset successfully' });
+        res.status(200).json({ message: 'Password reset successfully. Please log in again.' });
       }
     } else {
       res.status(400).json({ message: 'Invalid or expired token. Please try again.' });
@@ -168,7 +221,6 @@ export async function resetPassword(req: Request, res: Response) {
     res.status(500).json({ message: 'An error occurred' });
   };
 }
-
 
 export const fetchUserById = async (req: Request, res: Response) => {
   try {
