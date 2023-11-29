@@ -510,43 +510,31 @@
       "/routines/create": {
         "post": {
           "summary": "Create a new routine",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "routine",
-              "description": "Routine details",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "user_id": {
-                    "type": "integer",
-                    "description": "ID of the user creating the routine"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "Name of the routine"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of the routine"
-                  },
-                  "time_block": {
-                    "type": "string",
-                    "description": "Time block for the routine"
-                  }
-                }
-              }
-            }
-          ],
           "requestBody": {
+            "description": "routine details",
+            "required": true,
             "content": {
               "application/json": {
-                "example": {
-                  "user_id": 123,
-                  "name": "Morning Routine",
-                  "description": "Start your day right",
-                  "time_block": "1h"
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "description": "ID of the user creating the routine"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the routine"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the routine"
+                    },
+                    "time_block": {
+                      "type": "string",
+                      "description": "Time block for the routine"
+                    }
+                  }
                 }
               }
             }
@@ -636,49 +624,35 @@
       "/routines/update": {
         "put": {
           "summary": "Update a routine by ID",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "updates",
-              "description": "Updates to be applied to the routine",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "routine_id": {
-                    "type": "integer",
-                    "description": "ID of the routine to be updated"
-                  },
-                  "updates": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "Updated name of the routine"
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Updated description of the routine"
-                      },
-                      "time_block": {
-                        "type": "string",
-                        "description": "Updated time block for the routine"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          ],
           "requestBody": {
+            "description": "User details for password reset initiation",
+            "required": true,
             "content": {
               "application/json": {
-                "example": {
-                  "routine_id": 123,
-                  "updates": {
-                    "name": "Updated Routine",
-                    "description": "Updated description",
-                    "time_block": "2h"
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "routine_id": {
+                      "type": "integer",
+                      "description": "ID of the routine to be updated"
+                    },
+                    "updates": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Updated name of the routine"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Updated description of the routine"
+                        },
+                        "time_block": {
+                          "type": "string",
+                          "description": "Updated time block for the routine"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -721,48 +695,35 @@
       "/routines/step/add": {
         "post": {
           "summary": "Create a new step",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "step",
-              "description": "Step details",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "routine_id": {
-                    "type": "integer",
-                    "description": "ID of the routine for which the step is created"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "Name of the step"
-                  },
-                  "icon": {
-                    "type": "string",
-                    "description": "Icon for the step"
-                  },
-                  "time_slot": {
-                    "type": "string",
-                    "description": "Time slot for the step"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of the step"
-                  }
-                }
-              }
-            }
-          ],
           "requestBody": {
+            "description": "User details for password reset initiation",
+            "required": true,
             "content": {
               "application/json": {
-                "example": {
-                  "routine_id": 123,
-                  "name": "Wake up",
-                  "icon": "sun",
-                  "time_slot": "morning",
-                  "description": "Gently, no alarms"
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "routine_id": {
+                      "type": "integer",
+                      "description": "ID of the routine for which the step is created"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the step"
+                    },
+                    "icon": {
+                      "type": "string",
+                      "description": "Icon for the step"
+                    },
+                    "time_slot": {
+                      "type": "string",
+                      "description": "Time slot for the step"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Description of the step"
+                    }
+                  }
                 }
               }
             }
@@ -852,54 +813,39 @@
       "/routines/step/update": {
         "put": {
           "summary": "Update a step by ID",
-          "parameters": [
-            {
-              "in": "body",
-              "name": "updates",
-              "description": "Updates to be applied to the step",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "step_id": {
-                    "type": "integer",
-                    "description": "ID of the step to be updated"
-                  },
-                  "updates": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "Updated name of the step"
-                      },
-                      "icon": {
-                        "type": "string",
-                        "description": "Updated icon for the step"
-                      },
-                      "time_slot": {
-                        "type": "string",
-                        "description": "Updated time slot for the step"
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Updated description of the step"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          ],
           "requestBody": {
+            "description": "User details for password reset initiation",
+            "required": true,
             "content": {
               "application/json": {
-                "example": {
-                  "step_id": 123,
-                  "updates": {
-                    "name": "Updated Step",
-                    "icon": "moon",
-                    "time_slot": "night",
-                    "description": "Updated description"
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "step_id": {
+                      "type": "integer",
+                      "description": "ID of the step to be updated"
+                    },
+                    "updates": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Updated name of the step"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "description": "Updated icon for the step"
+                        },
+                        "time_slot": {
+                          "type": "string",
+                          "description": "Updated time slot for the step"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Updated description of the step"
+                        }
+                      }
+                    }
                   }
                 }
               }
